@@ -1,3 +1,4 @@
+from turtle import title
 import matplotlib.pyplot as plt
 import seaborn as sns
 from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
@@ -22,10 +23,12 @@ def plot_df(
     plt.gca().set(title=title, xlabel=xlabel, ylabel=ylabel)
 
 
-def plot_acf_pacf(series):
-    fig, axes = plt.subplots(2, 1, figsize=(16, 10), dpi=100)
-    plot_acf(series.tolist(), lags=50, ax=axes[0])
-    plot_pacf(series.tolist(), lags=50, ax=axes[1])
+def plot_acf_pacf(series,n_lags=60, title_suffix = "", figsize=(10, 8)):
+    fig, axes = plt.subplots(2, 1, figsize=figsize, dpi=100)
+    plot_acf(series.tolist(), lags=n_lags, ax=axes[0])
+    plot_pacf(series.tolist(), lags=n_lags, ax=axes[1])
+    axes[0].set_title("Autocorrelation " + title_suffix)
+    axes[1].set_title("Partial Autocorrelation " + title_suffix)
     plt.show()
 
 
