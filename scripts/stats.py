@@ -1,5 +1,7 @@
 from statsmodels.tsa.stattools import adfuller, kpss
+from statsmodels.tsa.arima.model import ARIMAResults
 import pandas as pd
+import numpy as np
 
 
 def adf_test(
@@ -55,3 +57,30 @@ def kpss_test(
         print("\tTime series is stationary")
 
     return result
+
+
+def forecast_accuracy(fitted: ARIMAResults, actual: pd.Series):
+    forecast = fitted.get_forecast(len(actual))
+    fc = forecast.predicted_mean
+
+    # Make as pandas series
+    mape = np.mean(np.abs(fc - actual) / np.abs(actual))  # MAPE
+    me = np.mean(fc - actual)  # ME
+    mae = np.mean(np.abs(fc - actual))  # MAE
+    mpe = np.mean((fc - actual) / actual)  # MPE
+    rmse = np.mean((fc - actual) ** 2) ** 0.5  # RMSE
+    corr = np.corrcoef(fc, actual)[0, 1]  # corr
+    mins = np.amin(np.hstack([fc[:, None], actual[:, None]]), axis=1)
+    maxs = np.amax(np.hstack([fc[:, None], actual[:, None]]), axis=1)
+    minmax = 1 - np.mean(mins / maxs)  # minmax
+    # acf1 = acf(fc - test)[1]  # ACF1
+    return {
+        "mape": mape,
+        "me": me,
+        "mae": mae,
+        "mpe": mpe,
+        "rmse": rmse,
+        # "acf1": acf1,
+        "corr": corr,
+        "minmax": minmax,
+    }

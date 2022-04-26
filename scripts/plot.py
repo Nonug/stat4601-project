@@ -1,3 +1,4 @@
+from tkinter import font
 from turtle import title
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -10,9 +11,16 @@ from statsmodels.tsa.seasonal import DecomposeResult
 from statsmodels.tsa.arima.model import ARIMAResults
 
 
-
 def plot_df(
-    df, x="", y="", title="", xlabel="Date", ylabel="Value", dpi=100, figsize=(30, 10)
+    df,
+    x="",
+    y="",
+    title="",
+    xlabel="Date",
+    ylabel="Value",
+    dpi=100,
+    figsize=(30, 10),
+    fontsize=10,
 ):
     plt.figure(figsize=figsize, dpi=dpi)
     # plt.plot(x, y, color='tab:red')
@@ -20,10 +28,11 @@ def plot_df(
         sns.lineplot(data=df)
     else:
         sns.lineplot(data=df, x=x, y=y)
-    plt.gca().set(title=title, xlabel=xlabel, ylabel=ylabel)
+    plt.gca().set(xlabel=xlabel, ylabel=ylabel)
+    plt.title(title, fontdict={"fontsize": fontsize})
 
 
-def plot_acf_pacf(series,n_lags=60, title_suffix = "", figsize=(10, 8)):
+def plot_acf_pacf(series, n_lags=60, title_suffix="", figsize=(10, 8)):
     fig, axes = plt.subplots(2, 1, figsize=figsize, dpi=100)
     plot_acf(series.tolist(), lags=n_lags, ax=axes[0])
     plot_pacf(series.tolist(), lags=n_lags, ax=axes[1])
@@ -73,10 +82,11 @@ def plot_seasonal_decompose(
         )
     )
 
-def plot_forecast(fitted: ARIMAResults, test : pd.Series, _title = "Forecast vs Actual"):
+
+def plot_forecast(fitted: ARIMAResults, test: pd.Series, _title="Forecast vs Actual"):
     forecast = fitted.get_forecast(len(test))
     fc = forecast.predicted_mean
-    conf = forecast.conf_int(alpha=0.05) # 95% conf
+    conf = forecast.conf_int(alpha=0.05)  # 95% conf
 
     # Make as pandas series
     fc_series = pd.Series(fc, index=test.index)
@@ -84,12 +94,13 @@ def plot_forecast(fitted: ARIMAResults, test : pd.Series, _title = "Forecast vs 
     upper_series = pd.Series(conf.iloc[:, 1], index=test.index)
 
     # Plot
-    plt.figure(figsize=(12,5), dpi=100)
-    plt.plot(fitted.data.orig_endog[:], label='training')
-    plt.plot(test, label='actual')
-    plt.plot(fc_series, label='forecast')
-    plt.fill_between(lower_series.index, lower_series, upper_series, 
-                    color='k', alpha=.15)
+    plt.figure(figsize=(12, 5), dpi=100)
+    plt.plot(fitted.data.orig_endog[:], label="training")
+    plt.plot(test, label="actual")
+    plt.plot(fc_series, label="forecast")
+    plt.fill_between(
+        lower_series.index, lower_series, upper_series, color="k", alpha=0.15
+    )
     plt.title(_title)
-    plt.legend(loc='upper left', fontsize=8)
+    plt.legend(loc="upper left", fontsize=8)
     plt.show()
